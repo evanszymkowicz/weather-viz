@@ -9,7 +9,12 @@ Combining the two to try to wrap a D3 viz with a UI.
 
 # May 24
 Trying to fix this error:
+<<<<<<< HEAD
 ![error](public/error.png)
+=======
+
+![error](public/error/png)
+>>>>>>> 87331707f037b29fbe13cf13b4bee20f64a166bb
 
 
 ## Available Scripts
