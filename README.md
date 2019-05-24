@@ -9,6 +9,7 @@ Combining the two to try to wrap a D3 viz with a UI.
 
 # May 24
 Trying to fix this error:
+
 ![error](public/error/png)
 
 
