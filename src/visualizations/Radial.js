@@ -9,39 +9,38 @@ const green = '#b6e86f';
 const blue = '#52b6ca';
 const colors = chroma.scale([blue, green, red]);
 
-
 class Radial extends Component {
-	state = {
-		slices: [], //Each slice in the array wll represent a day
-		tempAnnotaionts: [],
-		radiusScale: d3.scaleLinear().range([0, width / 2]), //set for half the size of the container
-		colorScale: d3.scaleLinear(),
-		arcGenerator: d3.arc(),
-	};
+  state = {
+    slices: [], // array of svg path commands, each representing a day
+    tempAnnotations: [],
+    // d3 helpers
+    radiusScale: d3.scaleLinear().range([0, width / 2]),
+    colorScale: d3.scaleLinear(),
+    arcGenerator: d3.arc(),
+  };
 
-	static getDerivedStateFromProps(nextProps, prevState) {
-		if (!nextProps.data) return null;
-		const {data} = nextProps;
-		const {radiusScale, colorScale, arcGenerator} = prevState;
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (!nextProps.data) return null; // data hasn't been loaded yet so do nothing
+    const {data} = nextProps;
+    const {radiusScale, colorScale, arcGenerator} = prevState;
 
+    // data has changed, so recalculate scale domains
+    const tempMax = d3.max(data, d => d.high);
+    const colorDomain = d3.extent(data, d => d.avg);
+    radiusScale.domain([0, tempMax]);
+    colorScale.domain(colorDomain);
 
-		//this is to run after data is selected
-		const tempMax = d3.max(data, d => d.high);
-		const colorDomain = d3.extent(data, d => d.avg);
-		radiusScale.domain([0, tempMax]);
-		radiusScale.domain(colorDomain);
+    // one arc per day, innerRadius is low temp, outerRadius is high temp
+    const perSliceAngle = (2 * Math.PI) / data.length;
+    const slices = data.map((d, i) => {
+      const path = arcGenerator({
+        startAngle: i * perSliceAngle,
+        endAngle: (i + 1) * perSliceAngle,
+        innerRadius: radiusScale(d.low),
+        outerRadius: radiusScale(d.high),
+      });
 
-		// innerRadius is low temp, outerRadius is high temp
-		const perSliceAngle = (2 * Math.PI) / data.length;
-		const slices = data.map((d, i) => {
-			const path =arcGenerator({
-				startAngle: i * perSliceAngle,
-				endAngle: (i +1) * perSliceAngle,
-				innerRadius: radiusScale(d.low),
-				outerRadius: radiusScale(d.high),
-			});
-
-			return {path, fill: colors(colorScale(d.avg))};
+      return {path, fill: colors(colorScale(d.avg))};
     });
 
     const tempAnnotations = [5, 20, 40, 60, 80].map(temp => {
@@ -51,15 +50,15 @@ class Radial extends Component {
       }
     });
 
-		return (slices, tempAnnotations);
-	}
+    return {slices, tempAnnotations};
+  }
 
-	render() {
-		return(
-			<svg width={width} height={height}>
-				<g transform={`translate(${width / 2}, ${height / 2})`}>
-          //{this.state.slices.map((d, i) => (<path key={i} d={d.path} fill={d.fill} />))}
-					{this.state.slices.map((d, i) => (<path key={i} d={d.path} fill={d.fill} />))}
+  render() {
+
+    return (
+      <svg width={width} height={height}>
+        <g transform={`translate(${width / 2}, ${height / 2})`}>
+          {this.state.slices.map((d, i) => (<path key={i} d={d.path} fill={d.fill} />))}
 
           {this.state.tempAnnotations.map((d, i) => (
             <g key={i}>
@@ -74,3 +73,69 @@ class Radial extends Component {
 }
 
 export default Radial;
+
+
+// class Radial extends Component {
+// 	state = {
+// 		slices: [], //Each slice in the array wll represent a day
+// 		tempAnnotaionts: [],
+// 		radiusScale: d3.scaleLinear().range([0, width / 2]), //set for half the size of the container
+// 		colorScale: d3.scaleLinear(),
+// 		arcGenerator: d3.arc(),
+// 	};
+//
+// 	static getDerivedStateFromProps(nextProps, prevState) {
+// 		if (!nextProps.data) return null;
+// 		const {data} = nextProps;
+// 		const {radiusScale, colorScale, arcGenerator} = prevState;
+//
+//
+// 		//this is to run after data is selected
+// 		const tempMax = d3.max(data, d => d.high);
+// 		const colorDomain = d3.extent(data, d => d.avg);
+// 		radiusScale.domain([0, tempMax]);
+// 		radiusScale.domain(colorDomain);
+//
+// 		// innerRadius is low temp, outerRadius is high temp
+// 		const perSliceAngle = (2 * Math.PI) / data.length;
+// 		const slices = data.map((d, i) => {
+// 			const path =arcGenerator({
+// 				startAngle: i * perSliceAngle,
+// 				endAngle: (i +1) * perSliceAngle,
+// 				innerRadius: radiusScale(d.low),
+// 				outerRadius: radiusScale(d.high),
+// 			});
+//
+// 			return {path, fill: colors(colorScale(d.avg))};
+//     });
+//
+//     const tempAnnotations = [5, 20, 40, 60, 80].map(temp => {
+//       return {
+//         r: radiusScale(temp),
+//         temp,
+//       }
+//     });
+//
+// 		return (slices, tempAnnotations);
+// 	}
+//
+// 	render() {
+// 		return(
+// 			<svg width={width} height={height}>
+// 				<g transform={`translate(${width / 2}, ${height / 2})`}>
+//           //{this.state.slices.map((d, i) => (<path key={i} d={d.path} fill={d.fill} />))}
+// 					{this.state.slices.map((d, i) => (<path key={i} d={d.path} fill={d.fill} />))}
+//
+//           {this.state.tempAnnotations.map((d, i) => (
+//             <g key={i}>
+//               <circle r={d.r} fill='none' stroke='#999' />
+//               <text y={-d.r - 2} textAnchor='middle'>{d.temp}℉</text>
+//             </g>
+//           ))}
+//         </g>
+//       </svg>
+//     );
+//   }
+// }
+//
+// export default Radial;

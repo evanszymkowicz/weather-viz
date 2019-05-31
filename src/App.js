@@ -9,14 +9,14 @@ import LineChart from './visualizations/LineChart';
 class App extends Component {
   state = {
     temps: {},
-    city: 'dc', //default on start
+    city: 'ny', //default on start
   };
 
   componentDidMount() {
       Promise.all([
-        fetch(`${process.env.PUBLIC_URL}/dc.json`), //fetch
-        fetch(`${process.env.PUBLIC_URL}/ny.json`), //fetch again
-        fetch(`${process.env.PUBLIC_URL}/atl.json`), //absolutely fetching
+        fetch(`${process.env.PUBLIC_URL}/ny.json`), //fetch
+        fetch(`${process.env.PUBLIC_URL}/sf.json`), //fetch again
+        fetch(`${process.env.PUBLIC_URL}/us.json`), //absolutely fetching
       ]).then(responses => Promise.all(responses.map(resp => resp.json())))
       .then(([dc, ny, atl]) => {
         dc.forEach(day => day.date = new Date(day.date)); //sets to state
@@ -36,7 +36,7 @@ class App extends Component {
   return (
       <div className="App">
         <h1>
-          2017 Temperatures in
+          2018 Temperatures in
           <select name='city' onChange={this.updateCity}>
             {
               [
