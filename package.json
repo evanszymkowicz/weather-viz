@@ -1,5 +1,6 @@
 {
   "name": "weather-viz",
+  "homepage": "http://evanszymkowicz.github.io/weather-viz",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
