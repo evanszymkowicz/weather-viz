@@ -9,20 +9,20 @@ import LineChart from './visualizations/LineChart';
 class App extends Component {
   state = {
     temps: {},
-    city: 'ny', //default on start
+    city: 'sf', //default on start
   };
 
   componentDidMount() {
       Promise.all([
-        fetch(`${process.env.PUBLIC_URL}/ny.json`), //fetch
-        fetch(`${process.env.PUBLIC_URL}/sf.json`), //fetch again
-        fetch(`${process.env.PUBLIC_URL}/us.json`), //absolutely fetching
+        fetch(`${process.env.PUBLIC_URL}/sf.json`), //fetch
+        fetch(`${process.env.PUBLIC_URL}/ny.json`), //fetch again
+        fetch(`${process.env.PUBLIC_URL}/am.json`), //absolutely fetching
       ]).then(responses => Promise.all(responses.map(resp => resp.json())))
-      .then(([dc, ny, atl]) => {
-        dc.forEach(day => day.date = new Date(day.date)); //sets to state
+      .then(([sf, ny, am]) => {
+        sf.forEach(day => day.date = new Date(day.date)); //sets to state
         ny.forEach(day => day.date = new Date(day.date)); //ditto
         //then
-        this.setState({temps: {dc, ny, atl}});
+        this.setState({temps: {sf, ny, am}});
       });
     }
 
@@ -40,7 +40,7 @@ class App extends Component {
           <select name='city' onChange={this.updateCity}>
             {
               [
-                {label: 'Washington, D.C.', value: 'dc'},
+                {label: 'San Francisco', value: 'sf'},
                 {label: 'New York', value: 'ny'},
               ].map(option => {
                 return (<option key={option.value} value={option.value}>{option.label}</option>);
@@ -55,7 +55,7 @@ class App extends Component {
         <Radial data={data} />
 
         <p>
-          (Temperature Information Provided By: <a href='wunderground.com' target='_new'>Wunderground</a>)
+          (Temperature Information Provided via: <a href='wunderground.com' target='_new'>Wunderground</a>)
         </p>
       </div>
     );

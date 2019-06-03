@@ -14,7 +14,7 @@ select {
 }
 
 svg {
-  border: 1px solid #666;
+  /* border: 1px solid #666; */
   margin: 5px;
   vertical-align: top;
 }
